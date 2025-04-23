@@ -8,31 +8,31 @@ const openai = new OpenAIApi(configuration);
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ message: "Only POST allowed" });
+    res.status(405).json({ message: "Only POST allowed" });
+    return;
   }
 
   const { message } = req.body;
+
   if (!message) {
-    return res.status(400).json({ message: "Ingen fråga angiven." });
+    res.status(400).json({ message: "Missing message in request body." });
+    return;
   }
 
   try {
     const response = await openai.createChatCompletion({
       model: "gpt-4",
       messages: [
-        {
-          role: "system",
-          content: "Du är en trevlig och hjälpsam kundtjänstassistent för Botrygg. Svara tydligt och korrekt.",
-        },
+        { role: "system", content: "Du är en trevlig och tydlig kundtjänstmedarbetare på Botrygg." },
         { role: "user", content: message },
       ],
       max_tokens: 500,
     });
 
-    const reply = response.data.choices?.[0]?.message?.content?.trim();
-    return res.status(200).json({ reply });
+    const reply = response.data.choices?.[0]?.message?.content;
+    res.status(200).json({ reply });
   } catch (error) {
-    console.error("OpenAI error:", error.message);
-    return res.status(500).json({ reply: "Kunde inte hämta svar från GPT." });
+    console.error("OpenAI error:", error);
+    res.status(500).json({ reply: "Fel vid kontakt med OpenAI." });
   }
 }
