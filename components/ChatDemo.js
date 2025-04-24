@@ -1,3 +1,4 @@
+// redep
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import logo from '../public/logga.png';
